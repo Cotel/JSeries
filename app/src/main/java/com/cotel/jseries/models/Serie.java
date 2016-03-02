@@ -5,6 +5,8 @@
  */
 package com.cotel.jseries.models;
 
+import com.cotel.jseries.utils.UrlReader;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -13,6 +15,8 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -93,7 +97,7 @@ public class Serie implements Serializable{
             }
         } catch (JSONException ex) {
             ex.printStackTrace();
-        }        
+        }
     }
     
     /**
@@ -257,18 +261,4 @@ public class Serie implements Serializable{
         }
         return false;
     }
-    
-
-    
-//    public static void main(String[] args) {
-//        Serie arrow = new Serie("tt3107288");
-//        arrow.setVistosHasta(2, 14);
-//        for(int i=0; i<arrow.getTemporadas(); i++) {
-//            for(int j=0; j<arrow.getVistos()[i].length; j++) {
-//                System.out.printf("%02dx%02d " + arrow.getVistos()[i][j] + "\n", i+1, j+1);
-//            }
-//        }
-//        
-//    }
-    
 }
