@@ -41,7 +41,6 @@ public class MainActivity extends AppCompatActivity {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-
     }
 
     @Override
@@ -64,9 +63,27 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent newSerieIntent = new Intent(MainActivity.this, NewSerieView.class);
-                MainActivity.this.startActivity(newSerieIntent);
+                MainActivity.this.startActivityForResult(newSerieIntent, 1);
             }
         });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(requestCode == 1) {
+            if(resultCode == Activity.RESULT_OK) {
+                SerieRetriever aux = new SerieRetriever(data.getExtras().getString("addedSerie"));
+                aux.start();
+                try {
+                    aux.join();
+                    series.add(aux.serie);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            } else if(resultCode == Activity.RESULT_CANCELED) {
+
+            }
+        }
     }
 
     public List<Serie> getSeries() {

@@ -12,6 +12,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.cotel.jseries.MainActivity;
 import com.cotel.jseries.R;
@@ -100,6 +101,15 @@ public class NewSerieView extends AppCompatActivity {
         public View getView(int position, View convertView, ViewGroup parent) {
             final int pos = position;
             ImageView poster = new ImageView(context);
+            TextView title = new TextView(context);
+
+            try {
+                title.setText(resultados.getJSONObject(position).getString("Title") + "\t" +
+                            resultados.getJSONObject(position).getString("Year"));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
             poster.setLayoutParams(new GridView.LayoutParams(300, 370));
             poster.setScaleType(ImageView.ScaleType.CENTER_CROP);
             poster.setPadding(5, 5, 5, 5);
@@ -116,7 +126,10 @@ public class NewSerieView extends AppCompatActivity {
                         retriever.start();
                         retriever.join();
                         Serie toAdd = retriever.serie;
-                        Intent intent = new Intent()
+                        Intent goBack = new Intent();
+                        goBack.putExtra("addedSerie", toAdd.getId());
+                        setResult(Activity.RESULT_OK, goBack);
+                        finish();
                     } catch (JSONException e) {
                         e.printStackTrace();
                     } catch (InterruptedException e) {
