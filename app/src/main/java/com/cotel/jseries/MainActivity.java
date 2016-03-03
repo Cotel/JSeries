@@ -20,6 +20,13 @@ import com.cotel.jseries.models.Serie;
 import com.cotel.jseries.utils.DownloadImageTask;
 import com.cotel.jseries.utils.SerieRetriever;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,25 +35,29 @@ public class MainActivity extends AppCompatActivity {
     private List<Serie> series;
 
     public MainActivity() {
-        series = new ArrayList<>();
-        SerieRetriever serieRetriever1 = new SerieRetriever("tt2193021");
-        SerieRetriever serieRetriever2 = new SerieRetriever("tt1856010");
-        serieRetriever1.start();
-        serieRetriever2.start();
-        try {
-            serieRetriever1.join();
-            serieRetriever2.join();
-            series.add(serieRetriever1.serie);
-            series.add(serieRetriever2.serie);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        File file = new File(getFilesDir() + "data.db");
+        FileInputStream fis;
+        ObjectInputStream ois;
+        try {
+            fis = new FileInputStream(file);
+            ois = new ObjectInputStream(fis);
+            this.series = (ArrayList<Serie>) ois.readObject();
+            ois.close();
+        } catch (IOException e) {
+            Toast.makeText(this, "Base de datos vacía",
+                    Toast.LENGTH_LONG).show();
+            this.series = new ArrayList<>();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
 
         GridView imagenes = (GridView) findViewById(R.id.gridView);
         imagenes.setAdapter(new ImageAdapter(this));
@@ -76,13 +87,40 @@ public class MainActivity extends AppCompatActivity {
                 aux.start();
                 try {
                     aux.join();
-                    series.add(aux.serie);
+                    boolean exists = false;
+                    for(Serie serie : series) {
+                        if(serie.equals(aux.serie)) {
+                            exists = true;
+                        }
+                    }
+                    if(!exists) {
+                        series.add(aux.serie);
+                        rellenarArchivo();
+                    }
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             } else if(resultCode == Activity.RESULT_CANCELED) {
 
             }
+        }
+    }
+
+    private void rellenarArchivo() {
+        try {
+            File fileSeries = new File(getFilesDir() + "data.db");
+            FileOutputStream fos = new FileOutputStream(fileSeries);
+            ObjectOutputStream oos;
+            try {
+                oos = new ObjectOutputStream(fos);
+                oos.writeObject(series);
+                oos.flush();
+                oos.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
         }
     }
 

@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -99,45 +100,55 @@ public class NewSerieView extends AppCompatActivity {
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-            final int pos = position;
-            ImageView poster = new ImageView(context);
-            TextView title = new TextView(context);
+            LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-            try {
-                title.setText(resultados.getJSONObject(position).getString("Title") + "\t" +
-                            resultados.getJSONObject(position).getString("Year"));
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
+            View listaResultados;
+            if(convertView == null) {
+                listaResultados = new View(context);
+                listaResultados = inflater.inflate(R.layout.search_results, null);
 
-            poster.setLayoutParams(new GridView.LayoutParams(300, 370));
-            poster.setScaleType(ImageView.ScaleType.CENTER_CROP);
-            poster.setPadding(5, 5, 5, 5);
-            try {
-                new DownloadImageTask(poster).execute(resultados.getJSONObject(position).getString("Poster"));
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            poster.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    try {
-                        SerieRetriever retriever = new SerieRetriever(resultados.getJSONObject(pos).getString("imdbID"));
-                        retriever.start();
-                        retriever.join();
-                        Serie toAdd = retriever.serie;
-                        Intent goBack = new Intent();
-                        goBack.putExtra("addedSerie", toAdd.getId());
-                        setResult(Activity.RESULT_OK, goBack);
-                        finish();
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+                final int pos = position;
+                ImageView poster = (ImageView) listaResultados.findViewById(R.id.resPoster);
+                TextView title = (TextView) listaResultados.findViewById(R.id.resTitle);
+                TextView year = (TextView) listaResultados.findViewById(R.id.resYear);
+
+                try {
+                    title.setText(resultados.getJSONObject(position).getString("Title"));
+                    year.setText(resultados.getJSONObject(position).getString("Year"));
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
-            });
-            return poster;
+
+                poster.setScaleType(ImageView.ScaleType.CENTER_CROP);
+//                poster.setPadding(5, 5, 5, 5);
+                try {
+                    new DownloadImageTask(poster).execute(resultados.getJSONObject(position).getString("Poster"));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                poster.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        try {
+                            SerieRetriever retriever = new SerieRetriever(resultados.getJSONObject(pos).getString("imdbID"));
+                            retriever.start();
+                            retriever.join();
+                            Serie toAdd = retriever.serie;
+                            Intent goBack = new Intent();
+                            goBack.putExtra("addedSerie", toAdd.getId());
+                            setResult(Activity.RESULT_OK, goBack);          // Corregir fallo al pulsar imagen sin teclado
+                            finish();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+            } else {
+                listaResultados = (View) convertView;
+            }
+            return listaResultados;
         }
     }
 }
