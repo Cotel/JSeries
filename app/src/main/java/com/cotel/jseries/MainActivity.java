@@ -1,9 +1,9 @@
 package com.cotel.jseries;
 
+import android.app.Activity;
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.os.AsyncTask;
+import android.content.Intent;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -15,24 +15,22 @@ import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.cotel.jseries.activities.NewSerieView;
 import com.cotel.jseries.models.Serie;
 import com.cotel.jseries.utils.DownloadImageTask;
-import com.cotel.jseries.utils.UrlReader;
+import com.cotel.jseries.utils.SerieRetriever;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    List<Serie> series;
+    private List<Serie> series;
 
     public MainActivity() {
         series = new ArrayList<>();
-        UrlReader serieRetriever1 = new UrlReader("tt2193021");
-        UrlReader serieRetriever2 = new UrlReader("tt1856010");
+        SerieRetriever serieRetriever1 = new SerieRetriever("tt2193021");
+        SerieRetriever serieRetriever2 = new SerieRetriever("tt1856010");
         serieRetriever1.start();
         serieRetriever2.start();
         try {
@@ -60,6 +58,19 @@ public class MainActivity extends AppCompatActivity {
                         Toast.LENGTH_LONG).show();
             }
         });
+
+        FloatingActionButton newSerie = (FloatingActionButton) findViewById(R.id.newSerie);
+        newSerie.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent newSerieIntent = new Intent(MainActivity.this, NewSerieView.class);
+                MainActivity.this.startActivity(newSerieIntent);
+            }
+        });
+    }
+
+    public List<Serie> getSeries() {
+        return series;
     }
 
     public class ImageAdapter extends BaseAdapter {

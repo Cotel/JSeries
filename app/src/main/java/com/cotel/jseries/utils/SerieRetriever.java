@@ -13,12 +13,12 @@ import java.nio.charset.StandardCharsets;
 /**
  * Created by Cotel on 02/03/2016.
  */
-public class UrlReader extends Thread{
+public class SerieRetriever extends Thread{
 
     private String id;
     public Serie serie;
 
-    public UrlReader(String id) {
+    public SerieRetriever(String id) {
         this.id = id;
     }
 
@@ -26,4 +26,6 @@ public class UrlReader extends Thread{
     public void run() {
         this.serie = new Serie(this.id);
     }
+
+
 }
