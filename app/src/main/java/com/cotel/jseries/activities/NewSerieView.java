@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,11 +34,16 @@ public class NewSerieView extends AppCompatActivity {
 
     private static final String BASE = "https://www.omdbapi.com/?s=";
 
+    private Toolbar toolbar;
+
 
     @Override
     public void onCreate(Bundle savedInstance) {
         super.onCreate(savedInstance);
         setContentView(R.layout.new_serie_view);
+
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
         final EditText busqueda = (EditText) findViewById(R.id.editText);
         Button ok = (Button) findViewById(R.id.button);

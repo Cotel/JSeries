@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_height="match_parent"
+    android:layout_width="wrap_content"
+    tools:context="com.cotel.jseries.PanelFragment">
+
+<GridView
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/gridView"
+    android:numColumns="auto_fit"
+    android:verticalSpacing="10dp"
+    android:horizontalSpacing="10dp"
+    android:stretchMode="columnWidth"
+    android:gravity="center"
+    android:paddingTop="16dp"
+    android:paddingBottom="16dp"
+    android:clipToPadding="false"/>
+<!--android:layout_marginTop="16dp"-->
+<!--android:layout_alignParentTop="true" />-->
+<!--android:layout_alignParentStart="true"-->
+<!--android:layout_alignParentEnd="true"-->
+
+
+<FrameLayout
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="bottom|right|end"
+    android:layout_margin="16dp"
+    android:layout_alignParentEnd="true"
+    android:layout_alignParentBottom="true"
+    android:paddingBottom="60dp">
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/newSerie"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:src="@android:color/transparent"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="+"
+        android:elevation="16dp"
+        android:textColor="@android:color/white"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+</FrameLayout>
+</RelativeLayout>
+
+
+
+

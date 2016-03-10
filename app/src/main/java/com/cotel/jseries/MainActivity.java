@@ -1,11 +1,18 @@
 package com.cotel.jseries;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -34,6 +41,10 @@ public class MainActivity extends AppCompatActivity {
 
     private List<Serie> series;
 
+    private Toolbar toolbar;
+    private TabLayout tabLayout;
+    private ViewPager viewPager;
+
     public MainActivity() {
 
     }
@@ -43,126 +54,53 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        File file = new File(getFilesDir() + "data.db");
-        FileInputStream fis;
-        ObjectInputStream ois;
-        try {
-            fis = new FileInputStream(file);
-            ois = new ObjectInputStream(fis);
-            this.series = (ArrayList<Serie>) ois.readObject();
-            ois.close();
-        } catch (IOException e) {
-            Toast.makeText(this, "Base de datos vacía",
-                    Toast.LENGTH_LONG).show();
-            this.series = new ArrayList<>();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        viewPager = (ViewPager) findViewById(R.id.viewpager);
+        setupViewPager(viewPager);
+
+        tabLayout = (TabLayout) findViewById(R.id.tabs);
+        tabLayout.setupWithViewPager(viewPager);
+
+    }
+
+    private void setupViewPager(ViewPager viewPager) {
+        ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
+        adapter.addFragment(new PanelFragment(), "Panel");
+        viewPager.setAdapter(adapter);
+    }
+
+    class ViewPagerAdapter extends FragmentPagerAdapter {
+        private final List<Fragment> mFragmentList = new ArrayList<>();
+        private final List<String> mFragmentTitleList = new ArrayList<>();
+
+        public ViewPagerAdapter(FragmentManager manager) {
+            super(manager);
         }
 
-        GridView imagenes = (GridView) findViewById(R.id.gridView);
-        imagenes.setAdapter(new ImageAdapter(this));
-        imagenes.setOnItemClickListener(new OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Toast.makeText(getBaseContext(), "pic" + (i + 1) + " selected",
-                        Toast.LENGTH_LONG).show();
-            }
-        });
-
-        FloatingActionButton newSerie = (FloatingActionButton) findViewById(R.id.newSerie);
-        newSerie.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent newSerieIntent = new Intent(MainActivity.this, NewSerieView.class);
-                MainActivity.this.startActivityForResult(newSerieIntent, 1);
-            }
-        });
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(requestCode == 1) {
-            if(resultCode == Activity.RESULT_OK) {
-                SerieRetriever aux = new SerieRetriever(data.getExtras().getString("addedSerie"));
-                aux.start();
-                try {
-                    aux.join();
-                    boolean exists = false;
-                    for(Serie serie : series) {
-                        if(serie.equals(aux.serie)) {
-                            exists = true;
-                        }
-                    }
-                    if(!exists) {
-                        series.add(aux.serie);
-                        rellenarArchivo();
-                    }
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            } else if(resultCode == Activity.RESULT_CANCELED) {
-
-            }
-        }
-    }
-
-    private void rellenarArchivo() {
-        try {
-            File fileSeries = new File(getFilesDir() + "data.db");
-            FileOutputStream fos = new FileOutputStream(fileSeries);
-            ObjectOutputStream oos;
-            try {
-                oos = new ObjectOutputStream(fos);
-                oos.writeObject(series);
-                oos.flush();
-                oos.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public List<Serie> getSeries() {
-        return series;
-    }
-
-    public class ImageAdapter extends BaseAdapter {
-
-        Context context;
-
-        public ImageAdapter(Context c) {
-            this.context = c;
+        @Override
+        public Fragment getItem(int position) {
+            return mFragmentList.get(position);
         }
 
         @Override
         public int getCount() {
-            return series.size();
+            return mFragmentList.size();
+
+        }
+
+        public void addFragment(Fragment fragment, String title) {
+            mFragmentList.add(fragment);
+            mFragmentTitleList.add(title);
         }
 
         @Override
-        public Object getItem(int position) {
-            return position;
-        }
-
-        @Override
-        public long getItemId(int position) {
-            return position;
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            ImageView poster = new ImageView(context);
-            poster.setLayoutParams(new GridView.LayoutParams(300, 370));
-            poster.setScaleType(ImageView.ScaleType.CENTER_CROP);
-            poster.setPadding(5, 5, 5, 5);
-            new DownloadImageTask(poster).execute(series.get(position).getUrlImagen());
-            return poster;
+        public CharSequence getPageTitle(int position) {
+            return mFragmentTitleList.get(position);
         }
     }
 
 }
-
-
-
